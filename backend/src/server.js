@@ -1,5 +1,5 @@
 import { Inngest } from "inngest";
-import { Dbconnect } from "./db.js";
+import { Dbconnect } from "../src/lib/db.js";
 import { userModel } from "../models/User.js";
 
 export const inngest = new Inngest({ id: "interviewX" });
