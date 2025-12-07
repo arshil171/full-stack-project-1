@@ -1,54 +1,40 @@
-import express from "express";
-import path from "path";
-import dotenv from "dotenv";
-import cors from "cors";
+import { Inngest } from "inngest";
+import { Dbconnect } from "./db.js";
+import { userModel } from "../models/User.js";
 
-import { Dbconnect } from "./lib/db.js";
-// import { signuRoute } from "./routes/signupRoute.js";
+export const inngest = new Inngest({ id: "interviewX" });
 
-import { serve } from "inngest/express";
-import { inngest, functions } from "./lib/inngest.js";
-
-dotenv.config();
-
-const app = express();
-const __dirname = path.resolve();
-
-// middleware
-app.use(express.json());
-app.use(cors({ origin: process.env.CLINT_URL, credentials: true }));
-
-// Inngest route
-app.use("/api/inngest", serve({ client: inngest, functions }));
-
-// routes
-// app.use("/signup", signuRoute);
-
-app.get("/books", (req, res) => {
-  res.status(200).json({ message: "hello Arshil" });
-});
-
-// production build
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../frontend/dist")));
-
-  app.get("/*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
-  });
-}
-
-// start server
-const startServer = async () => {
-  try {
+const syncUser = inngest.createFunction(
+  { id: "sync-user" },
+  { event: "clerk/user.created" },
+  async ({ event }) => {
     await Dbconnect();
 
-    app.listen(process.env.PORT, () => {
-      console.log("Server running at", process.env.PORT);
-    });
-  } catch (error) {
-    console.log(error);
-  }
-};
+    const { id, email_addresses, first_name, last_name, image_url } = event.data;
 
-startServer();
-  
+    const newUser = {
+      clerkId: id,
+      email: email_addresses[0]?.email_address,
+      name: `${first_name || ""} ${last_name || ""}`,
+      profileImage: image_url,
+    };
+
+    await userModel.create(newUser);
+  }
+);
+
+const deleteUserFromDB = inngest.createFunction(
+  { id: "delete-user-from-db" },
+  { event: "clerk/user.deleted" },
+  async ({ event }) => {
+    await Dbconnect();
+
+    const { id } = event.data;
+
+    await userModel.deleteOne({ clerkId: id });
+  }
+);
+
+// export const functions = { syncUser, deleteUserFromDB };
+export const functions = [syncUser, deleteUserFromDB];
+

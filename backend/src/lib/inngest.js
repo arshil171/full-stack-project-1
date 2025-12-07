@@ -2,7 +2,8 @@ import { Inngest } from "inngest";
 import { Dbconnect } from "./db.js";
 import { userModel } from "../models/User.js";
 
-export const inngest = new Inngest({ id: "interviewX" });
+
+const inngest = new Inngest({ id: "interviewX", apiKey: process.env.INNGEST_EVENT_KEY });
 
 const syncUser = inngest.createFunction(
   { id: "sync-user" },
