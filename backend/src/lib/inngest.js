@@ -2,9 +2,12 @@ import { Inngest } from "inngest";
 import { Dbconnect } from "./db.js";
 import { userModel } from "../models/User.js";
 
+export const inngest = new Inngest({
+  id: "interviewX",
+  apiKey: process.env.INNGEST_EVENT_KEY,
+});
 
-const inngest = new Inngest({ id: "interviewX", apiKey: process.env.INNGEST_EVENT_KEY });
-
+// Sync user when created
 const syncUser = inngest.createFunction(
   { id: "sync-user" },
   { event: "clerk/user.created" },
@@ -24,6 +27,7 @@ const syncUser = inngest.createFunction(
   }
 );
 
+// Delete user from DB
 const deleteUserFromDB = inngest.createFunction(
   { id: "delete-user-from-db" },
   { event: "clerk/user.deleted" },
@@ -36,6 +40,4 @@ const deleteUserFromDB = inngest.createFunction(
   }
 );
 
-// export const functions = { syncUser, deleteUserFromDB };
 export const functions = [syncUser, deleteUserFromDB];
-

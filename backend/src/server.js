@@ -1,40 +1,26 @@
-import { Inngest } from "inngest";
-import { Dbconnect } from "../src/lib/db.js";
-import { userModel } from "../models/User.js";
+import express from "express";
+import dotenv from "dotenv";
+import { Dbconnect } from "./lib/db.js";
+import { inngestHandler } from "./lib/inngestHandler.js";
 
-export const inngest = new Inngest({ id: "interviewX" });
+dotenv.config();
 
-const syncUser = inngest.createFunction(
-  { id: "sync-user" },
-  { event: "clerk/user.created" },
-  async ({ event }) => {
-    await Dbconnect();
+const app = express();
+app.use(express.json());
 
-    const { id, email_addresses, first_name, last_name, image_url } = event.data;
+// Connect DB on startup
+Dbconnect();
 
-    const newUser = {
-      clerkId: id,
-      email: email_addresses[0]?.email_address,
-      name: `${first_name || ""} ${last_name || ""}`,
-      profileImage: image_url,
-    };
+// Basic route
+app.get("/", (req, res) => {
+  res.send("Backend running...");
+});
 
-    await userModel.create(newUser);
-  }
-);
+// Inngest endpoint required for functions to run
+app.post("/api/inngest", inngestHandler);
 
-const deleteUserFromDB = inngest.createFunction(
-  { id: "delete-user-from-db" },
-  { event: "clerk/user.deleted" },
-  async ({ event }) => {
-    await Dbconnect();
+const PORT = process.env.PORT || 8080;
 
-    const { id } = event.data;
-
-    await userModel.deleteOne({ clerkId: id });
-  }
-);
-
-// export const functions = { syncUser, deleteUserFromDB };
-export const functions = [syncUser, deleteUserFromDB];
-
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
