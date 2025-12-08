@@ -6,6 +6,9 @@ dotenv.config();
 const apiKey = process.env.STREAM_API_KEY
 const apiSecret = process.env.STREAM_API_SECRET
 
+console.log(apiKey)
+console.log(apiSecret)
+
 if(!apiKey || !apiSecret){
     console.log("Stream Api key or Secret is missing")
 }
