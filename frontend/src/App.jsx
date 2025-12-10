@@ -1,27 +1,30 @@
-import { SignedIn, SignedOut, SignInButton, SignOutButton, UserButton } from '@clerk/clerk-react'
+import { SignedIn, SignedOut, SignInButton, SignOutButton, UserButton, useUser } from '@clerk/clerk-react'
 import React from 'react'
+import { Navigate, Route, Routes } from 'react-router-dom'
+import HomePage from '../pages/HomePage'
+import {Toaster} from "react-hot-toast"
+import ProblemsPage from '../pages/ProblemsPage'
 
 
 const App = () => {
+
+  const {isSignedIn} = useUser()
   return (
     <>
-      <h1>Welcome to the app</h1>
+    <Routes>
+     
 
-      <SignedOut>
-        <SignInButton mode='modal' >
-           <button>Login</button>
-        </SignInButton>
-      </SignedOut>
+      <Route path='/' element={<HomePage />} />
+      <Route path='/problems' element={isSignedIn ? <ProblemsPage /> : <Navigate to={"/"}/> } />
 
-      <SignedIn>
-         <SignOutButton />
-      </SignedIn>
+    </Routes>
 
-      <SignedIn>
-        <UserButton/>
-      </SignedIn>
+    <Toaster  toastOptions={{duration:3000}} />
     </>
   )
 }
 
 export default App
+
+// tw , daisyui , react-router , react-hot-toast ,
+// todo :  react-query aka tanstack query, axios

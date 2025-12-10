@@ -12,11 +12,14 @@
   "dependencies": {
     "@clerk/clerk-react": "^5.57.0",
     "@tailwindcss/vite": "^4.1.17",
+    "@tanstack/react-query": "^5.90.12",
+    "axios": "^1.13.2",
     "build": "^0.1.4",
     "npm": "^11.6.4",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "react-router-dom": "^7.9.6",
+    "react-hot-toast": "^2.6.0",
+    "react-router-dom": "^7.10.1",
     "run": "^1.5.0",
     "tailwindcss": "^4.1.17"
   },
@@ -25,6 +28,7 @@
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "daisyui": "^5.5.8",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
